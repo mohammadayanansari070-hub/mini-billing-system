@@ -4,6 +4,15 @@ from datetime import datetime
 import sqlite3
 
 app = Flask(__name__)
+@app.context_processor
+def inject_shop_name():
+    try:
+        conn = get_db()
+        setting = conn.execute("SELECT value FROM settings WHERE key='shop_name'").fetchone()
+        conn.close()
+        return {'shop_name': setting['value'] if setting else 'Mini Billing System'}
+    except:
+        return {'shop_name': 'Mini Billing System'}
 app.secret_key = 'your_secret_key_here'
 
 DATABASE = 'inventory.db'
@@ -328,6 +337,29 @@ def sale_details(sale_id):
     
     conn.close()
     return render_template('sale_details.html', sale=sale, items=items)
-
+@app.route('/settings', methods=['GET', 'POST'])
+def settings():
+    """Settings page"""
+    conn = get_db()
+    
+    if request.method == 'POST':
+        shop_name = request.form['shop_name']
+        conn.execute(
+            'UPDATE settings SET value=? WHERE key=?',
+            (shop_name, 'shop_name')
+        )
+        conn.commit()
+        conn.close()
+        flash('✅ Settings updated successfully!')
+        return redirect(url_for('settings'))
+    
+    setting = conn.execute(
+        "SELECT value FROM settings WHERE key='shop_name'"
+    ).fetchone()
+    conn.close()
+    
+    return render_template('settings.html', shop_name=setting['value'] if setting else 'Mini Billing System')
 if __name__ == '__main__':
-    app.run(debug=True)
+    import os
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=False)
