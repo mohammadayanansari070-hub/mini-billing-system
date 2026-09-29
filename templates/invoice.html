@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block title %}Invoice {{ sale.invoice_number }}{% endblock %}
+
+{% block content %}
+
+<div class="invoice-box">
+
+    <div class="invoice-header">
+        <h1>🧾 INVOICE</h1>
+        <p style="color: #64748b; font-size: 1.15rem; font-weight: 600; margin: 6px 0;">
+            {{ sale.invoice_number }}
+        </p>
+        <p style="color: #64748b; font-size: 0.95rem;">
+            📅 Date: {{ sale.sale_date }}
+        </p>
+    </div>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Item</th>
+                <th style="text-align: right;">Price</th>
+                <th style="text-align: center;">Qty</th>
+                <th style="text-align: right;">Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in items %}
+            <tr>
+                <td>{{ item.name }}</td>
+                <td style="text-align: right;">₹{{ "%.2f"|format(item.price) }}</td>
+                <td style="text-align: center;">{{ item.quantity }}</td>
+                <td style="text-align: right; font-weight: 600;">
+                    ₹{{ "%.2f"|format(item.total) }}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="invoice-summary">
+        <div class="summary-row total">
+            <span>Total Amount:</span>
+            <span style="color: #10b981;">
+                ₹{{ "%.2f"|format(sale.total_amount) }}
+            </span>
+        </div>
+        <div class="summary-row">
+            <span>Paid Amount:</span>
+            <span>₹{{ "%.2f"|format(sale.paid_amount or 0) }}</span>
+        </div>
+        <div class="summary-row">
+            <span>Balance:</span>
+            <span style="color: {% if sale.balance < 0 %}#ef4444{% else %}#10b981{% endif %}; font-weight: 700;">
+                ₹{{ "%.2f"|format(sale.balance or 0) }}
+            </span>
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 32px; padding-top: 24px; border-top: 1px solid #e2e8f0;">
+        <button onclick="window.print()" class="btn btn-primary" style="margin: 4px;">
+            🖨️ Print Invoice
+        </button>
+        <a href="/billing" class="btn btn-success" style="margin: 4px;">
+            ➕ New Bill
+        </a>
+        <a href="/sales" class="btn btn-secondary" style="margin: 4px;">
+            📊 Sales History
+        </a>
+    </div>
+
+</div>
+
+<style media="print">
+    .navbar, .btn, .flash {
+        display: none !important;
+    }
+    body {
+        background: white;
+    }
+    .container {
+        padding: 0;
+        margin: 0;
+    }
+    .invoice-box {
+        box-shadow: none;
+        padding: 0;
+        max-width: 100%;
+    }
+</style>
+
+{% endblock %}

@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+
+<h1>🏠 Dashboard</h1>
+<p style="color: #64748b; margin-bottom: 32px; font-size: 1.05rem;">
+    Welcome to Mini Billing &amp; Inventory System
+</p>
+
+<!-- Statistics Cards -->
+<div class="stats-grid">
+    <div class="stat-card blue">
+        <div class="stat-label">📦 Total Products</div>
+        <div class="stat-value">{{ total_products }}</div>
+    </div>
+    <div class="stat-card purple">
+        <div class="stat-label">📊 Total Stock</div>
+        <div class="stat-value">{{ total_stock }}</div>
+    </div>
+    <div class="stat-card green">
+        <div class="stat-label">💰 Total Sales</div>
+        <div class="stat-value green">₹{{ "%.2f"|format(total_sales) }}</div>
+    </div>
+    <div class="stat-card orange">
+        <div class="stat-label">📅 Today's Sales</div>
+        <div class="stat-value blue">₹{{ "%.2f"|format(today_sales) }}</div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="card" style="text-align: center; margin-bottom: 32px;">
+    <h3>⚡ Quick Actions</h3>
+    <div style="margin-top: 16px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+        <a href="/add_product" class="btn btn-primary">➕ Add Product</a>
+        <a href="/billing" class="btn btn-success">🧾 Create Bill</a>
+        <a href="/sales" class="btn btn-secondary">📊 View Sales</a>
+    </div>
+</div>
+
+<!-- Recent Sales and Low Stock -->
+<div class="grid-2">
+
+    <!-- Recent Sales -->
+    <div class="card">
+        <div class="card-header">
+            <h3>🕐 Recent Sales</h3>
+            <a href="/sales" style="color: #2563eb; font-size: 0.9rem; text-decoration: none;">View All →</a>
+        </div>
+        {% if recent_sales %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Invoice</th>
+                    <th style="text-align: right;">Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sale in recent_sales %}
+                <tr>
+                    <td>{{ sale.invoice_number }}</td>
+                    <td style="text-align: right; font-weight: 600; color: #10b981;">
+                        ₹{{ "%.2f"|format(sale.total_amount) }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p style="text-align: center; color: #64748b; padding: 20px 0;">
+            No sales yet. Create your first bill!
+        </p>
+        {% endif %}
+    </div>
+
+    <!-- Low Stock Alert -->
+    <div class="card">
+        <div class="card-header">
+            <h3>⚠️ Low Stock Alert</h3>
+            <a href="/products" style="color: #2563eb; font-size: 0.9rem; text-decoration: none;">View All →</a>
+        </div>
+        {% if low_stock %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th style="text-align: right;">Stock</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in low_stock %}
+                <tr>
+                    <td>{{ product.name }}</td>
+                    <td style="text-align: right; font-weight: 600; color: #ef4444;">
+                        {{ product.stock_quantity }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p style="text-align: center; color: #10b981; padding: 20px 0;">
+            ✅ All products have sufficient stock!
+        </p>
+        {% endif %}
+    </div>
+
+</div>
+
+{% endblock %}
